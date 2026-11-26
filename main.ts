@@ -21,15 +21,15 @@ const MAX_LENGTH = 240;
  * faintly passive-aggressive, keeping a flat ledger of every sheet.
  *
  * Why this line:
- * - It counts. A printer that has fed 41,209 sheets knows the jam was never
- *   the paper's idea — the tally is the machine's own flat logic.
+ * - It opens like a log entry. "Sheet 41,209." is how a machine keeps its
+ *   receipt — flat, counted, no feelings — which is the printer's voice.
  * - It names the crime precisely: a stapled essay, fed at 4:59 p.m., which is
  *   a specific office sin rather than a recycled "paper jam" shrug.
- * - It answers the thump. The operator hit the machine for a jam the
- *   operator caused, and the machine kept the receipt.
+ * - It answers the thump in one breath. The operator hit the machine for a
+ *   jam the operator caused, and the machine kept the receipt.
  */
 const PRINTER_LINE =
-  "I have counted 41,209 sheets, and not one of them jammed itself \u2014 " +
+  "Sheet 41,209. Not one of them jammed itself \u2014 " +
   "you fed me a stapled essay at 4:59 p.m. and then thumped me for it.";
 
 /**
@@ -48,6 +48,13 @@ function validateLine(line: string): void {
   }
   if (line.includes("\n") || line.includes("\r")) {
     throw new Error("entry line must be a single line");
+  }
+  // The gate reads UTF-8 text: a stray control character would fail it,
+  // so reject anything below the printable range outright.
+  for (const ch of line) {
+    if (ch.codePointAt(0)! < 0x20) {
+      throw new Error("entry line must not contain control characters");
+    }
   }
 }
 
